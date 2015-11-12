@@ -218,52 +218,6 @@ static const int AUDIT_FILTER_MASK		= 0x07;	/* Mask to get actual filter */
 static const int AUDIT_FILTER_UNSET		= 0x80;	/* This value means filter is unset */
 ]]
 
---[=[
-ffi.cdef[[
-/* Defines for interfield comparison update */
-//static const int AUDIT_OBJ_UID  = 109;
-//static const int AUDIT_OBJ_GID  = 110;
-//static const int AUDIT_FIELD_COMPARE = 111;
-]]
-
-
-ffi.cdef[[
-static const int AUDIT_COMPARE_UID_TO_OBJ_UID  = 1;
-static const int AUDIT_COMPARE_GID_TO_OBJ_GID  = 2;
-static const int AUDIT_COMPARE_EUID_TO_OBJ_UID = 3;
-static const int AUDIT_COMPARE_EGID_TO_OBJ_GID = 4;
-static const int AUDIT_COMPARE_AUID_TO_OBJ_UID = 5;
-static const int AUDIT_COMPARE_SUID_TO_OBJ_UID = 6;
-static const int AUDIT_COMPARE_SGID_TO_OBJ_GID = 7;
-static const int AUDIT_COMPARE_FSUID_TO_OBJ_UID= 8;
-static const int AUDIT_COMPARE_FSGID_TO_OBJ_GID= 9;
-static const int AUDIT_COMPARE_UID_TO_AUID     = 10;
-static const int AUDIT_COMPARE_UID_TO_EUID     = 11;
-static const int AUDIT_COMPARE_UID_TO_FSUID    = 12;
-static const int AUDIT_COMPARE_UID_TO_SUID     = 13;
-static const int AUDIT_COMPARE_AUID_TO_FSUID   = 14;
-static const int AUDIT_COMPARE_AUID_TO_SUID    = 15;
-static const int AUDIT_COMPARE_AUID_TO_EUID    = 16;
-static const int AUDIT_COMPARE_EUID_TO_SUID    = 17;
-static const int AUDIT_COMPARE_EUID_TO_FSUID   = 18;
-static const int AUDIT_COMPARE_SUID_TO_FSUID   = 19;
-static const int AUDIT_COMPARE_GID_TO_EGID     = 20;
-static const int AUDIT_COMPARE_GID_TO_FSGID    = 21;
-static const int AUDIT_COMPARE_GID_TO_SGID     = 22;
-static const int AUDIT_COMPARE_EGID_TO_FSGID   = 23;
-static const int AUDIT_COMPARE_EGID_TO_SGID    = 24;
-static const int AUDIT_COMPARE_SGID_TO_FSGID   = 25;
-]]
-
-
-ffi.cdef[[
-static const int EM_ARM  = 40;
-static const int EM_AARCH64 = 183;
-
-static const int AUDIT_ARCH_AARCH64	= (EM_AARCH64|__AUDIT_ARCH_64BIT|__AUDIT_ARCH_LE);
-static const int AUDIT_ARCH_PPC64LE	= (EM_PPC64|__AUDIT_ARCH_64BIT|__AUDIT_ARCH_LE);
-]]
---]=]
 
 ffi.cdef[[
 //////////////////////////////////////////////////////

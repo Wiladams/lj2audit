@@ -1,17 +1,17 @@
 local ffi = require("ffi")
 local aup = require("auparse_ffi")
+local AURecord = require("AURecord")
 
-local function stringvalue(strptr)
-	if strptr == nil then return nil end
+local stringvalue = aup.stringvalue;
 
-	return ffi.string(strptr)
-end
 
 local AUCursor = {}
 setmetatable(AUCursor, {
 	__call = function(self, ...)
 		return self:new(...)
 	end,
+
+	__index = AURecord;
 })
 
 local AUCursor_mt = {
@@ -57,6 +57,7 @@ function AUCursor.nextEvent(self)
 	return res > 0
 end
 
+-- iterate over all the events
 function AUCursor.events(self)
 	local function gen_events(param, state)
 
@@ -68,103 +69,18 @@ function AUCursor.events(self)
 	return gen_events, self, 1
 end
 
+-- Return the number of records that can be found
+-- within the current event.
 function AUCursor.numRecords(self)
 	return aup.auparse_get_num_records(self.Handle);
 end
 
+
+
 --[[
 	Iterate over the individual records within the event
 	that we're currently sitting on.
-
-/* Functions that traverse records in the same event */
-int auparse_first_record(auparse_state_t *au);
-int auparse_next_record(auparse_state_t *au);
-int auparse_goto_record_num(auparse_state_t *au, unsigned int num);
-
-/* Accessors to record data */
-//int auparse_get_type(auparse_state_t *au);
-//const char *auparse_get_type_name(auparse_state_t *au);
-//unsigned int auparse_get_line_number(auparse_state_t *au);
-//const char *auparse_get_filename(auparse_state_t *au);
-int auparse_first_field(auparse_state_t *au);
-int auparse_next_field(auparse_state_t *au);
-unsigned int auparse_get_num_fields(auparse_state_t *au);
-//const char *auparse_get_record_text(auparse_state_t *au);
-//const char *auparse_find_field(auparse_state_t *au, const char *name);
-//const char *auparse_find_field_next(auparse_state_t *au);
-
-
-const char *auparse_get_field_name(auparse_state_t *au);
-const char *auparse_get_field_str(auparse_state_t *au);
-int auparse_get_field_type(auparse_state_t *au);
-int auparse_get_field_int(auparse_state_t *au);
-const char *auparse_interpret_field(auparse_state_t *au);
-
 --]]
-
-
-
-function AUCursor.recordFilename(self)
-	local str = aup.auparse_get_filename(self.Handle);
-	if str == nil then 
-		return nil
-	end
-
-	return ffi.string(str)
-end
-
-function AUCursor.recordLineNumber(self)
-	return aup.auparse_get_line_number(self.Handle)
-end
-
-function AUCursor.recordNumFields(self)
-	local nFields = aup.auparse_get_num_fields(self.Handle);
-	return tonumber(nFields);
-end
-
-function AUCursor.recordType(self)
-	local rtype = aup.auparse_get_type(self.Handle);
-
-	return rtype;
-end
-
-
-function AUCursor.recordStrings(self)
-	local function gen_record(param, state)
-		local res = aup.auparse_goto_record_num(param.Handle, state)
-		if res < 1 then return nil end
-
-		local rectype = self:recordType();
-
-		local str = aup.auparse_get_record_text(param.Handle);
-		if str == nil then return nil end
-
-		return state+1, ffi.string(str)
-	end
-
-	-- move to the first record to start
-	local res = aup.auparse_first_record(self.Handle)
-
-	return gen_record, self, 0
-end
-
-function AUCursor.recordFields(self)
-	local function gen_field(param, state)
-		local res = aup.auparse_next_field(param.Handle);
-		if res < 1 then return nil end
-
-		local fieldname = aup.auparse_get_field_name(param.Handle);
-		local fieldvalue = aup.auparse_get_field_str(param.Handle);
-		local fieldtype = aup.auparse_get_field_type(param.Handle);
-		local fieldinterp = aup.auparse_interpret_field(param.Handle);
-
-		return state+1, stringvalue(fieldname), fieldtype, stringvalue(fieldvalue), stringvalue(fieldinterp)
-	end
-
-	return gen_field, self, 1
-end
-
-
 function AUCursor.records(self)
 	local function gen_record(param, state)
 		local res = aup.auparse_goto_record_num(param.Handle, state)

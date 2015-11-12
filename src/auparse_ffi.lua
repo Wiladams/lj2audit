@@ -142,12 +142,20 @@ int auparse_get_field_int(auparse_state_t *au);
 const char *auparse_interpret_field(auparse_state_t *au);
 ]]
 
+local function stringvalue(strptr)
+	if strptr == nil then return nil end
+
+	return ffi.string(strptr)
+end
 
 local Lib_auparse = ffi.load("auparse")
 
 local exports = {
 	Lib_auparse = Lib_auparse;
+
+	stringvalue = stringvalue;
 }
+
 setmetatable(exports, {
 	__index = function(self, key)
 		local value = nil;

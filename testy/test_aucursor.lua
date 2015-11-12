@@ -13,7 +13,7 @@ local function printTable(cursor)
 	for _, event in cursor:events() do
 		--print("Event: ", event, cursor:numRecords())
 
-		for _, recordString in cursor:recordStrings() do
+		for _, record in cursor:records() do
 			io.write(string.format("\t{\n"))
 			io.write(string.format("\t\trecordFilename = %s,\n", cursor:recordFilename()))
 			io.write(string.format("\t\trecordLineNumber = %d,\n", cursor:recordLineNumber()))
@@ -23,8 +23,8 @@ local function printTable(cursor)
 		
 			io.write(string.format("\t\tfields = {\n"))
 			-- for each record, print the fields, if any
-			for _, fieldname, fieldtype, fieldvalue,  fieldinterp in cursor:recordFields() do
-				io.write(string.format("\t\t\t['%s'] = '%s',\n", fieldname, fieldinterp))
+			for fieldname,fieldvalue in pairs(record.fields) do
+				io.write(string.format("\t\t\t['%s'] = '%s',\n", fieldname, fieldvalue))
 			end
 			io.write(string.format("\t\t},\n"))
 
@@ -51,5 +51,5 @@ end
 
 local cursor = AUCursor();
 
---printTable(cursor);
-printRecords(AUCursor())
+printTable(cursor);
+--printRecords(cursor);
