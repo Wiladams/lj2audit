@@ -38,18 +38,4 @@ local function printTable(cursor)
 end
 
 
-local function printRecords(cursor)
-	for _, event in cursor:events() do
-		print("============================")
-		for idx, record in cursor:records() do
-			fun.each(print, record)
-			print("--------------------------")
-			fun.each(print, record.fields)
-		end
-	end
-end
-
-local cursor = AUCursor();
-
-printTable(cursor);
---printRecords(cursor);
+printTable(AUCursor());
