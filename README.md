@@ -13,6 +13,8 @@ As is usual for this kind of binding, it can operate at two levels.  The lowest 
 interface which is fairly faithful to the original 'C' interface.  Here is a simple example of getting 
 a cursor opened, and moving to the next entry:
 
+NOTE: Running these commands requires root access, so running with 'sudo' is likely required.
+
 ```lua
 local ffi = require("ffi")
 local aup = require("auparse_ffi")
@@ -102,3 +104,11 @@ The libauparser library is capable of reading data from various sources.  In the
 is to read data from existing log files.  Another case is to read the data from the live running system.
 This capability already exists in the current implementation, although it's not taylored for that case, so 
 it needs some more work to make it viable.
+
+INSTALLING
+----------
+Required packages (Ubuntu)
+* libauparse-dev
+* libaudit-dev
+* sudo apt-get install auditd
+
