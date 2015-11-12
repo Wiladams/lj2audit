@@ -108,7 +108,7 @@ it needs some more work to make it viable.
 INSTALLING
 ----------
 Required packages (Ubuntu)
-* libauparse-dev
-* libaudit-dev
+* sudo apt-get install libauparse-dev
+* sudo apt-get install libaudit-dev
 * sudo apt-get install auditd
 
