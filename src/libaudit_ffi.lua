@@ -1,117 +1,83 @@
 local ffi = require("ffi")
 
+--[[
+	Note:  there are several constants that are defined both here and
+	in audit.lua
+
+	the ones here should be removed, or all them them should be consolidated
+	into a single file.
+--]]
+
 require("platform")
+require("audit")
 
---[[
-#include <asm/types.h>
-#include <stdint.h>
-#include <sys/socket.h>
-#include <linux/netlink.h>
-#include <linux/audit.h>
-#include <stdarg.h>
-#include <syslog.h>
---]]
---[[
-/* Audit message types as of 2.6.29 kernel:
- * 1000 - 1099 are for commanding the audit system
- * 1100 - 1199 user space trusted application messages
- * 1200 - 1299 messages internal to the audit daemon
- * 1300 - 1399 audit event messages
- * 1400 - 1499 kernel SE Linux use
- * 1500 - 1599 AppArmor events
- * 1600 - 1699 kernel crypto events
- * 1700 - 1799 kernel anomaly records
- * 1800 - 1899 kernel integrity labels and related events
- * 1800 - 1999 future kernel use
- * 2001 - 2099 unused (kernel)
- * 2100 - 2199 user space anomaly records
- * 2200 - 2299 user space actions taken in response to anomalies
- * 2300 - 2399 user space generated LSPP events
- * 2400 - 2499 user space crypto events
- * 2500 - 2599 user space virtualization management events
- * 2600 - 2999 future user space (maybe integrity labels and related events)
- */
---]]
-
---[[
-	perhaps the entirety of audit.h should be accessible through
-	ffi as well, but since the only a few things that 
-	are absolutely required in this context, they will be defined here
-
-audit.h
-AUDIT_FILTER_TYPE
-__AUDIT_ARCH_64BIT 0x80000000
-__AUDIT_ARCH_LE	   0x40000000
-
-elf.h
-#define EM_PPC64	21		/* PowerPC 64-bit */
-
---]]
-
-
+---[[
 ffi.cdef[[
-static const int AUDIT_FILTER_TYPE	= 0x05;	/* Apply rule at audit_log_start */
-static const int __AUDIT_ARCH_64BIT = 0x80000000;
-static const int __AUDIT_ARCH_LE	= 0x40000000;
-
-static const int EM_PPC64	= 21;		/* PowerPC 64-bit */
-
-]]
-
-ffi.cdef[[
-static const int AUDIT_FIRST_USER_MSG   = 1100;    /* First user space message */
-static const int AUDIT_LAST_USER_MSG    = 1199;    /* Last user space message */
+//static const int AUDIT_FIRST_USER_MSG   = 1100;    /* First user space message */
+//static const int AUDIT_LAST_USER_MSG    = 1199;    /* Last user space message */
 static const int AUDIT_USER_AUTH        = 1100;    /* User space authentication */
 static const int AUDIT_USER_ACCT        = 1101;    /* User space acct change */
 static const int AUDIT_USER_MGMT        = 1102;    /* User space acct management */
 static const int AUDIT_CRED_ACQ         = 1103;    /* User space credential acquired */
 static const int AUDIT_CRED_DISP        = 1104;    /* User space credential disposed */
 static const int AUDIT_USER_START       = 1105;    /* User space session start */
+]]
+--]=]
+
+
+ffi.cdef[[
 static const int AUDIT_USER_END         = 1106;    /* User space session end */
-static const int AUDIT_USER_AVC         = 1107;    /* User space avc message */
-static const int AUDIT_USER_CHAUTHTOK	=1108;	/* User space acct attr changed */
-static const int AUDIT_USER_ERR		=1109;	/* User space acct state err */
-static const int AUDIT_CRED_REFR         =1110;    /* User space credential refreshed */
+//static const int AUDIT_USER_AVC         = 1107;    /* User space avc message */
+static const int AUDIT_USER_CHAUTHTOK	= 1108;		/* User space acct attr changed */
+static const int AUDIT_USER_ERR			= 1109;		/* User space acct state err */
+static const int AUDIT_CRED_REFR        = 1110;    /* User space credential refreshed */
 static const int AUDIT_USYS_CONFIG      = 1111;    /* User space system config change */
-static const int AUDIT_USER_LOGIN	=1112;    /* User space user has logged in */
-static const int AUDIT_USER_LOGOUT	=1113;    /* User space user has logged out */
-static const int AUDIT_ADD_USER		=1114;    /* User space user account added */
-static const int AUDIT_DEL_USER		=1115;    /* User space user account deleted */
+]]
+
+
+ffi.cdef[[
+static const int AUDIT_USER_LOGIN		=1112;    /* User space user has logged in */
+static const int AUDIT_USER_LOGOUT		=1113;    /* User space user has logged out */
+static const int AUDIT_ADD_USER			=1114;    /* User space user account added */
+static const int AUDIT_DEL_USER			=1115;    /* User space user account deleted */
 static const int AUDIT_ADD_GROUP		=1116;    /* User space group added */
 static const int AUDIT_DEL_GROUP		=1117;    /* User space group deleted */
 static const int AUDIT_DAC_CHECK		=1118;    /* User space DAC check results */
-static const int AUDIT_CHGRP_ID		=1119;    /* User space group ID changed */
-static const int AUDIT_TEST		=1120;	/* Used for test success messages */
-static const int AUDIT_TRUSTED_APP	=1121;	/* Trusted app msg - freestyle text */
+static const int AUDIT_CHGRP_ID			=1119;    /* User space group ID changed */
+static const int AUDIT_TEST				=1120;	/* Used for test success messages */
+static const int AUDIT_TRUSTED_APP		=1121;	/* Trusted app msg - freestyle text */
 static const int AUDIT_USER_SELINUX_ERR	=1122;	/* SE Linux user space error */
-static const int AUDIT_USER_CMD		=1123;	/* User shell command and args */
-static const int AUDIT_USER_TTY		=1124;	/* Non-ICANON TTY input meaning */
+static const int AUDIT_USER_CMD			=1123;	/* User shell command and args */
+//static const int AUDIT_USER_TTY			=1124;	/* Non-ICANON TTY input meaning */
 static const int AUDIT_CHUSER_ID		=1125;	/* Changed user ID supplemental data */
-static const int AUDIT_GRP_AUTH		=1126;	/* Authentication for group password */
-static const int AUDIT_SYSTEM_BOOT	=1127;	/* System boot */
+static const int AUDIT_GRP_AUTH			=1126;	/* Authentication for group password */
+static const int AUDIT_SYSTEM_BOOT		=1127;	/* System boot */
 static const int AUDIT_SYSTEM_SHUTDOWN	=1128;	/* System shutdown */
 static const int AUDIT_SYSTEM_RUNLEVEL	=1129;	/* System runlevel change */
 static const int AUDIT_SERVICE_START	=1130;	/* Service (daemon) start */
-static const int AUDIT_SERVICE_STOP	=1131;	/* Service (daemon) stop */
+static const int AUDIT_SERVICE_STOP		=1131;	/* Service (daemon) stop */
+]]
 
-static const int AUDIT_FIRST_DAEMON	=1200;
-static const int AUDIT_LAST_DAEMON	=1299;
+
+ffi.cdef[[
+static const int AUDIT_FIRST_DAEMON		=1200;
+static const int AUDIT_LAST_DAEMON		=1299;
 static const int AUDIT_DAEMON_RECONFIG	=1204;	/* Auditd should reconfigure */
 static const int AUDIT_DAEMON_ROTATE	=1205;	/* Auditd should rotate logs */
 static const int AUDIT_DAEMON_RESUME	=1206;	/* Auditd should resume logging */
 static const int AUDIT_DAEMON_ACCEPT	=1207;    /* Auditd accepted remote connection */
-static const int AUDIT_DAEMON_CLOSE	=1208;    /* Auditd closed remote connection */
+static const int AUDIT_DAEMON_CLOSE		=1208;    /* Auditd closed remote connection */
 
-static const int AUDIT_FIRST_EVENT	=1300;
-static const int AUDIT_LAST_EVENT	=1399;
+static const int AUDIT_FIRST_EVENT		=1300;
+static const int AUDIT_LAST_EVENT		=1399;
 
 static const int AUDIT_FIRST_SELINUX	=1400;
-static const int AUDIT_LAST_SELINUX	=1499;
+static const int AUDIT_LAST_SELINUX		=1499;
 
-static const int AUDIT_FIRST_APPARMOR		=1500;
-static const int AUDIT_LAST_APPARMOR		=1599;
+static const int AUDIT_FIRST_APPARMOR	=1500;
+static const int AUDIT_LAST_APPARMOR	=1599;
 
-static const int AUDIT_AA			=1500;	/* Not upstream yet */
+static const int AUDIT_AA				=1500;	/* Not upstream yet */
 static const int AUDIT_APPARMOR_AUDIT		=1501;
 static const int AUDIT_APPARMOR_ALLOWED		=1502;
 static const int AUDIT_APPARMOR_DENIED		=1503;
@@ -123,20 +89,21 @@ static const int AUDIT_APPARMOR_ERROR		=1506;
 static const int AUDIT_FIRST_KERN_CRYPTO_MSG	=1600;
 static const int AUDIT_LAST_KERN_CRYPTO_MSG	=1699;
 
-static const int AUDIT_FIRST_KERN_ANOM_MSG	=1700;
-static const int AUDIT_LAST_KERN_ANOM_MSG	=1799;
+//static const int AUDIT_FIRST_KERN_ANOM_MSG	=1700;
+//static const int AUDIT_LAST_KERN_ANOM_MSG	=1799;
 
 static const int AUDIT_INTEGRITY_FIRST_MSG	=1800;
 static const int AUDIT_INTEGRITY_LAST_MSG	=1899;
 
-static const int AUDIT_INTEGRITY_DATA		=1800; /* Data integrity verification */
-static const int AUDIT_INTEGRITY_METADATA 	=1801; // Metadata integrity verification
-static const int AUDIT_INTEGRITY_STATUS		=1802; /* Integrity enable status */
-static const int AUDIT_INTEGRITY_HASH		=1803; /* Integrity HASH type */
-static const int AUDIT_INTEGRITY_PCR		=1804; /* PCR invalidation msgs */
-static const int AUDIT_INTEGRITY_RULE		=1805; /* Policy rule */
+//static const int AUDIT_INTEGRITY_DATA		=1800; /* Data integrity verification */
+//static const int AUDIT_INTEGRITY_METADATA 	=1801; // Metadata integrity verification
+//static const int AUDIT_INTEGRITY_STATUS		=1802; /* Integrity enable status */
+//static const int AUDIT_INTEGRITY_HASH		=1803; /* Integrity HASH type */
+//static const int AUDIT_INTEGRITY_PCR		=1804; /* PCR invalidation msgs */
+//static const int AUDIT_INTEGRITY_RULE		=1805; /* Policy rule */
+]]
 
-
+ffi.cdef[[
 static const int AUDIT_FIRST_ANOM_MSG		=2100;
 static const int AUDIT_LAST_ANOM_MSG		=2199;
 static const int AUDIT_ANOM_LOGIN_FAILURES	=2100; // Failed login limit reached
@@ -157,7 +124,9 @@ static const int AUDIT_ANOM_ADD_ACCT		=2114; // Adding an acct
 static const int AUDIT_ANOM_DEL_ACCT		=2115; // Deleting an acct
 static const int AUDIT_ANOM_MOD_ACCT		=2116; // Changing an acct
 static const int AUDIT_ANOM_ROOT_TRANS		=2117; // User became root
+]]
 
+ffi.cdef[[
 static const int AUDIT_FIRST_ANOM_RESP		=2200;
 static const int AUDIT_LAST_ANOM_RESP		=2299;
 static const int AUDIT_RESP_ANOMALY		=2200; /* Anomaly not reacted to */
@@ -173,7 +142,9 @@ static const int AUDIT_RESP_SEBOOL		=2209; /* Set an SE Linux boolean */
 static const int AUDIT_RESP_EXEC			=2210; /* Execute a script */
 static const int AUDIT_RESP_SINGLE		=2211; /* Go to single user mode */
 static const int AUDIT_RESP_HALT			=2212; /* take the system down */
+]]
 
+ffi.cdef[[
 static const int AUDIT_FIRST_USER_LSPP_MSG	=2300;
 static const int AUDIT_LAST_USER_LSPP_MSG	=2399;
 static const int AUDIT_USER_ROLE_CHANGE		=2300; /* User changed to a new role */
@@ -189,7 +160,9 @@ static const int AUDIT_FS_RELABEL		=2309; /* Filesystem relabeled */
 static const int AUDIT_USER_MAC_POLICY_LOAD	=2310; /* Userspc daemon loaded policy */
 static const int AUDIT_ROLE_MODIFY		=2311; /* Admin modified a role */
 static const int AUDIT_USER_MAC_CONFIG_CHANGE	=2312; /* Change made to MAC policy */
+]]
 
+ffi.cdef[[
 static const int AUDIT_FIRST_CRYPTO_MSG		=2400;
 static const int AUDIT_CRYPTO_TEST_USER		=2400; /* Crypto test results */
 static const int AUDIT_CRYPTO_PARAM_CHANGE_USER	=2401; /* Crypto attribute change */
@@ -200,7 +173,9 @@ static const int AUDIT_CRYPTO_FAILURE_USER	=2405; /* Fail decrypt,encrypt,random
 static const int AUDIT_CRYPTO_REPLAY_USER	=2406; /* Crypto replay detected */
 static const int AUDIT_CRYPTO_SESSION		=2407; /* Record parameters set during
 						TLS session establishment */
+]]
 
+ffi.cdef[[
 static const int AUDIT_LAST_CRYPTO_MSG		=2499;
 
 static const int AUDIT_FIRST_VIRT_MSG		=2500;
@@ -213,34 +188,46 @@ static const int AUDIT_LAST_VIRT_MSG		=2599;
 
 
 ffi.cdef[[
-static const int AUDIT_FIRST_USER_MSG2  =2100;    /* More userspace messages */
-static const int AUDIT_LAST_USER_MSG2   =2999;
+//static const int AUDIT_FIRST_USER_MSG2  =2100;    /* More userspace messages */
+//static const int AUDIT_LAST_USER_MSG2   =2999;
+]]
 
+ffi.cdef[[
 /* New kernel event definitions since 2.6.30 */
-static const int AUDIT_MMAP				=1323; /* Descriptor and flags in mmap */
+//static const int AUDIT_MMAP				=1323; /* Descriptor and flags in mmap */
+]]
 
-static const int AUDIT_NETFILTER_PKT	=1324; /* Packets traversing netfilter chains */
-static const int AUDIT_NETFILTER_CFG	=1325; /* Netfilter chain modifications */
-static const int AUDIT_SECCOMP			=1326; /* Secure Computing event */
-static const int AUDIT_PROCTITLE		=1327; /* Process Title info */
-static const int AUDIT_FEATURE_CHANGE	=1328; /* Audit feature changed value */
-static const int AUDIT_ANOM_LINK		=1702; /* Suspicious use of file links */
+ffi.cdef[[
+//static const int AUDIT_NETFILTER_PKT	=1324; /* Packets traversing netfilter chains */
+//static const int AUDIT_NETFILTER_CFG	=1325; /* Netfilter chain modifications */
+//static const int AUDIT_SECCOMP			=1326; /* Secure Computing event */
+//static const int AUDIT_PROCTITLE		=1327; /* Process Title info */
+//static const int AUDIT_FEATURE_CHANGE	=1328; /* Audit feature changed value */
+//static const int AUDIT_ANOM_LINK		=1702; /* Suspicious use of file links */
+]]
 
+ffi.cdef[[
 /* This is related to the filterkey patch */
 static const int AUDIT_KEY_SEPARATOR 	=0x01;
+]]
 
+ffi.cdef[[
 /* These are used in filter control */
 static const int AUDIT_FILTER_EXCLUDE	= AUDIT_FILTER_TYPE;
 static const int AUDIT_FILTER_MASK		= 0x07;	/* Mask to get actual filter */
 static const int AUDIT_FILTER_UNSET		= 0x80;	/* This value means filter is unset */
 ]]
 
+--[=[
 ffi.cdef[[
 /* Defines for interfield comparison update */
-static const int AUDIT_OBJ_UID  = 109;
-static const int AUDIT_OBJ_GID  = 110;
-static const int AUDIT_FIELD_COMPARE = 111;
+//static const int AUDIT_OBJ_UID  = 109;
+//static const int AUDIT_OBJ_GID  = 110;
+//static const int AUDIT_FIELD_COMPARE = 111;
+]]
 
+
+ffi.cdef[[
 static const int AUDIT_COMPARE_UID_TO_OBJ_UID  = 1;
 static const int AUDIT_COMPARE_GID_TO_OBJ_GID  = 2;
 static const int AUDIT_COMPARE_EUID_TO_OBJ_UID = 3;
@@ -266,13 +253,17 @@ static const int AUDIT_COMPARE_GID_TO_SGID     = 22;
 static const int AUDIT_COMPARE_EGID_TO_FSGID   = 23;
 static const int AUDIT_COMPARE_EGID_TO_SGID    = 24;
 static const int AUDIT_COMPARE_SGID_TO_FSGID   = 25;
+]]
 
+
+ffi.cdef[[
 static const int EM_ARM  = 40;
 static const int EM_AARCH64 = 183;
 
 static const int AUDIT_ARCH_AARCH64	= (EM_AARCH64|__AUDIT_ARCH_64BIT|__AUDIT_ARCH_LE);
 static const int AUDIT_ARCH_PPC64LE	= (EM_PPC64|__AUDIT_ARCH_64BIT|__AUDIT_ARCH_LE);
 ]]
+--]=]
 
 ffi.cdef[[
 //////////////////////////////////////////////////////
@@ -499,6 +490,7 @@ extern int audit_rule_interfield_comp_data(struct audit_rule_data **rulep,
 					 const char *pair, int flags);
 extern void audit_rule_free_data(struct audit_rule_data *rule);
 ]]
+--]=]
 
 local Lib_audit = ffi.load("audit")
 

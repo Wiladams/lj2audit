@@ -3,7 +3,6 @@
 local ffi = require("ffi")
 require("platform")
 
---require("auparse-defs")
 
 ffi.cdef[[
 /* Library type definitions */
