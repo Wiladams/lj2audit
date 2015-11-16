@@ -3,10 +3,10 @@
 	Print records in a reasonable report looking format
 --]]
 
-package.path = package.path..";../src/?.lua"
+package.path = package.path..";../../?.lua"
 
-local AUCursor = require("AUCursor")
-local fun = require("fun")
+local AUCursor = require("lj2audit.AUCursor")
+local fun = require("lj2audit.fun")
 
 
 local function printRecords(cursor)

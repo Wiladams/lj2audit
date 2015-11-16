@@ -1,7 +1,7 @@
 
 local ffi = require("ffi")
 
-require ("elf-em")
+require ("lj2audit.elf-em")
 
 
 

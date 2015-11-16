@@ -8,8 +8,8 @@ local ffi = require("ffi")
 	into a single file.
 --]]
 
-require("platform")
-require("audit")
+require("lj2audit.platform")
+require("lj2audit.audit")
 
 ---[[
 ffi.cdef[[

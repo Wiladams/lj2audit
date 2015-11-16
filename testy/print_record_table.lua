@@ -2,8 +2,8 @@
 
 package.path = package.path..";../src/?.lua"
 
-local AUCursor = require("AUCursor")
-local fun = require("fun")
+local AUCursor = require("lj2audit.AUCursor")
+local fun = require("lj2audit.fun")
 
 
 local function printTable(cursor)

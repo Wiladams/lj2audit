@@ -1,7 +1,7 @@
 
 
 local ffi = require("ffi")
-require("platform")
+require("lj2audit.platform")
 
 
 ffi.cdef[[

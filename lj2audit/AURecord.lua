@@ -1,5 +1,5 @@
 local ffi = require("ffi")
-local aup = require("auparse_ffi")
+local aup = require("lj2audit.auparse_ffi")
 
 local stringvalue = aup.stringvalue;
 
