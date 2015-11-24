@@ -1,6 +1,6 @@
 --test_auparse.lua
 
-package.path = package.path..";../src/?.lua"
+package.path = ";../?.lua;"..package.path
 
 local AUCursor = require("lj2audit.AUCursor")
 local fun = require("lj2audit.fun")

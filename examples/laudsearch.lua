@@ -1,3 +1,4 @@
+#!/usr/bin/env luajit
 --print_record_info.lua
 --[[
 	Print records in a reasonable report looking format
