@@ -3,7 +3,7 @@
 	Use the straight up 'C' interface to simply open
 	a cursor, move to the next record, and close the cursor
 --]]
-package.path = package.path..";../src/?.lua"
+package.path = ";../?.lua;"..package.path
 
 local ffi = require("ffi")
 local aup = require("auparse_ffi")
